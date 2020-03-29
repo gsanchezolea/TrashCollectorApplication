@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,10 +21,10 @@ namespace TrashCollectorApp.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Customer customer)
         {
-            var applicationDbContext = _context.Customers.Include(c => c.Address).Include(c => c.IdentityUser);
-            return View(await applicationDbContext.ToListAsync());
+            
+            return View();
         }
 
         // GET: Customers/Details/5
@@ -49,9 +50,9 @@ namespace TrashCollectorApp.Controllers
         // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "City");
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
+            Customer customer = new Customer();
+            customer = _context.Customers.Include(c => c.Address).FirstOrDefault();
+            return View(customer);
         }
 
         // POST: Customers/Create
@@ -59,13 +60,18 @@ namespace TrashCollectorApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,AddressId,FirstName,LastName,AccountIsActive,StartDate,PickUpDay,Balance")] Customer customer)
+        public async Task<IActionResult> Create(Customer customer)
         {
+            var userLoggedInId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            customer.IdentityUserId = userLoggedInId;
+            customer.AccountIsActive = true;
+            customer.StartDate = DateTime.Now;            
+
             if (ModelState.IsValid)
-            {
+            { 
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), customer);
             }
             ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "City", customer.AddressId);
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);

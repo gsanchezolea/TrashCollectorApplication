@@ -35,6 +35,9 @@ namespace TrashCollectorApp.Models
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
+        [Display(Name = "End Date")]
+        public DateTime EndDate { get; set; }
+
         [Required]
         [Display(Name = "Pick Up Day")]
         public DateTime PickUpDay { get; set; }

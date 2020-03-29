@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorApp.Data;
 
 namespace TrashCollectorApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200329195648_RemovedMaxLengthDataAnnotationFromZipCodePropertyInAddressModel")]
+    partial class RemovedMaxLengthDataAnnotationFromZipCodePropertyInAddressModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "05d5ad1d-5680-4710-9158-a659c00d5505",
-                            ConcurrencyStamp = "1e7e06be-d665-4748-b980-e5c07ba210d9",
+                            Id = "11b9189b-e2a1-4a3f-b2e5-022a4a30068f",
+                            ConcurrencyStamp = "2aa19346-197c-40a5-acb2-e1927f34998d",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
-                            Id = "baee42aa-50fd-4c0c-beeb-b09f8e2cc7b9",
-                            ConcurrencyStamp = "25ac4e3e-a224-4a94-b7c6-e8886d9f63f2",
+                            Id = "18026641-ef18-400e-b457-18fdaec8dcf2",
+                            ConcurrencyStamp = "0ab86b0a-eedf-4daa-b69a-f6e95a9666ec",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });
@@ -274,9 +276,6 @@ namespace TrashCollectorApp.Data.Migrations
 
                     b.Property<double>("Balance")
                         .HasColumnType("float");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

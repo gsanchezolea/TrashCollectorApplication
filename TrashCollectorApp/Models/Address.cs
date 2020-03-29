@@ -24,7 +24,6 @@ namespace TrashCollectorApp.Models
 
         [Required]
         [Display(Name = "Zip Code")]
-        [MaxLength(5)]
         public int ZipCode { get; set; }
     }
 }
