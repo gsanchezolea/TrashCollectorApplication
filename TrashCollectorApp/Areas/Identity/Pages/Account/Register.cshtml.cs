@@ -82,6 +82,7 @@ namespace TrashCollectorApp.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
+            string registerRoute = "s/Create";
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
@@ -93,6 +94,8 @@ namespace TrashCollectorApp.Areas.Identity.Pages.Account
                     if(await _roleManager.RoleExistsAsync(Input.Role))
                     {
                         await _userManager.AddToRoleAsync(user, Input.Role);
+                        returnUrl += Input.Role + registerRoute;
+
 
                     }
                     _logger.LogInformation("User created a new account with password.");
@@ -114,7 +117,6 @@ namespace TrashCollectorApp.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        //returnUrl += Input.Role + "s/Create"; **If global routing does not work we we will go back to using this line of code to route people to their appropriate /Controller/Create
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }

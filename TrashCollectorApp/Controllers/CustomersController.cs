@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,10 +51,11 @@ namespace TrashCollectorApp.Controllers
 
         // GET: Customers/Create
         public IActionResult Create()
-        {
+        {            
             Customer customer = new Customer();
+            customer = _context.Customers.Include(c => c.Address).FirstOrDefault();
 
-            return View();
+            return View(customer);
         }
 
         // POST: Customers/Create
@@ -61,13 +63,17 @@ namespace TrashCollectorApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,AddressId,FirstName,LastName,AccountIsActive,StartDate,EndDate,PickUpDay,Balance")] Customer customer)
+        public async Task<IActionResult> Create(Customer customer)
         {
             if (ModelState.IsValid)
             {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                customer.IdentityUserId = userId;
+                customer.AccountIsActive = true;
+                customer.StartDate = DateTime.Now;               
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Dashboard));
             }
             ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "City", customer.AddressId);
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
@@ -163,6 +169,14 @@ namespace TrashCollectorApp.Controllers
         private bool CustomerExists(int id)
         {
             return _context.Customers.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> Dashboard()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+            var listOfPickUps = _context.PickUps.Include(c => c.Customer).Include(c => c.Choice);
+            return View(await listOfPickUps.ToListAsync());
         }
     }
 }

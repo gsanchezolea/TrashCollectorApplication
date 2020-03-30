@@ -19,9 +19,7 @@ namespace TrashCollectorApp.Models
 
         [ForeignKey("Address")]
         public int AddressId { get; set; }
-        public Address Address { get; set; }
-
-     
+        public Address Address { get; set; }     
 
         [Required]
         [Display(Name = "First Name")]
@@ -39,11 +37,7 @@ namespace TrashCollectorApp.Models
 
         [Display(Name = "End Date")]
         public DateTime EndDate { get; set; }
-
-        [Required]
-        [Display(Name = "Pick Up Day")]
-        public DateTime PickUpDay { get; set; }
-
+              
         public double Balance { get; set; }
 
     }

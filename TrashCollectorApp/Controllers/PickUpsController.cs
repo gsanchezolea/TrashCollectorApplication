@@ -1,0 +1,196 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using TrashCollectorApp.Data;
+using TrashCollectorApp.Models;
+
+namespace TrashCollectorApp.Controllers
+{
+    public class PickUpsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public PickUpsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: PickUps
+        public async Task<IActionResult> Index()
+        {
+            var applicationDbContext = _context.PickUps.Include(p => p.Choice).Include(p => p.Customer);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        // GET: PickUps/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pickUp = await _context.PickUps
+                .Include(p => p.Choice)
+                .Include(p => p.Customer)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (pickUp == null)
+            {
+                return NotFound();
+            }
+
+            return View(pickUp);
+        }
+
+        // GET: PickUps/Create
+        public IActionResult Create()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customerId = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault().Id;
+            var pickUp = new PickUp()
+            {
+                CustomerId = customerId
+            };
+            var choices = _context.Choices.ToList();
+            ViewBag.Choices = new SelectList(choices, "Id", "Type");
+            return View(pickUp);
+        }
+
+        // POST: PickUps/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(PickUp pickUp)
+        {
+
+            if (ModelState.IsValid)
+            {
+                if(pickUp.ChoiceId == 1)
+                {
+                    var customer = _context.Customers.Where(c => c.Id == pickUp.CustomerId).SingleOrDefault();                    
+                    var endDate = customer.EndDate; //Last pickup day
+                    var scheduledDate = pickUp.Date;
+
+                    //Temporary List to keep track of dates locally
+                    List<PickUp> pickUps = new List<PickUp>();
+
+                    for (var i = scheduledDate; i < endDate; i.AddDays(7))
+                    {
+                        pickUp.Date = i;
+                        _context.Add(pickUp);
+                        await _context.SaveChangesAsync();
+                        pickUps.Add(pickUp);
+                    }
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+                else if(pickUp.ChoiceId == 2)
+                {
+                    _context.Add(pickUp);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+               
+            }
+            ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
+            return View(pickUp);
+        }
+
+        // GET: PickUps/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pickUp = await _context.PickUps.FindAsync(id);
+            if (pickUp == null)
+            {
+                return NotFound();
+            }
+            ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
+            return View(pickUp);
+        }
+
+        // POST: PickUps/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,ChoiceId,Date,Confirmed")] PickUp pickUp)
+        {
+            if (id != pickUp.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(pickUp);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PickUpExists(pickUp.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
+            return View(pickUp);
+        }
+
+        // GET: PickUps/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pickUp = await _context.PickUps
+                .Include(p => p.Choice)
+                .Include(p => p.Customer)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (pickUp == null)
+            {
+                return NotFound();
+            }
+
+            return View(pickUp);
+        }
+
+        // POST: PickUps/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var pickUp = await _context.PickUps.FindAsync(id);
+            _context.PickUps.Remove(pickUp);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool PickUpExists(int id)
+        {
+            return _context.PickUps.Any(e => e.Id == id);
+        }
+    }
+}
