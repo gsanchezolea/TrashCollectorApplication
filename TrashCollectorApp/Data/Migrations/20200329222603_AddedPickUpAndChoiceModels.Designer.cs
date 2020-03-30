@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorApp.Data;
 
 namespace TrashCollectorApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200329222603_AddedPickUpAndChoiceModels")]
+    partial class AddedPickUpAndChoiceModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "71de59b7-cc30-4351-b596-f10baf8174df",
-                            ConcurrencyStamp = "13baf23c-bb05-482e-94e5-1985b6a93c87",
+                            Id = "7dd172da-af98-4d26-8a90-933eb1de150f",
+                            ConcurrencyStamp = "083bad1f-b88f-4caa-8d4f-0e5a5f70e923",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
-                            Id = "ac4a042b-d82e-487c-bc3b-d1ce63d73255",
-                            ConcurrencyStamp = "1f3fa635-0eb7-4bf7-bd17-d2893cd3193f",
+                            Id = "8857ef44-cc41-4dae-9e60-710ef4e02dea",
+                            ConcurrencyStamp = "b5ab1d52-d53f-46df-bd56-240c0644fd0d",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });
@@ -320,6 +322,9 @@ namespace TrashCollectorApp.Data.Migrations
                     b.Property<DateTime>("PickUpDay")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("PickUpId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -328,6 +333,8 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasIndex("AddressId");
 
                     b.HasIndex("IdentityUserId");
+
+                    b.HasIndex("PickUpId");
 
                     b.ToTable("Customers");
                 });
@@ -369,17 +376,12 @@ namespace TrashCollectorApp.Data.Migrations
                     b.Property<bool>("Confirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ChoiceId");
-
-                    b.HasIndex("CustomerId");
 
                     b.ToTable("PickUps");
                 });
@@ -446,6 +448,12 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("IdentityUserId");
+
+                    b.HasOne("TrashCollectorApp.Models.PickUp", "PickUp")
+                        .WithMany()
+                        .HasForeignKey("PickUpId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TrashCollectorApp.Models.Employee", b =>
@@ -460,12 +468,6 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasOne("TrashCollectorApp.Models.Choice", "Choice")
                         .WithMany()
                         .HasForeignKey("ChoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TrashCollectorApp.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

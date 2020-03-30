@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrashCollectorApp.Data;
 
 namespace TrashCollectorApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200329230936_RemovedFKPickUpFromCustomerModelAddedFkCustomerToPickUpModel")]
+    partial class RemovedFKPickUpFromCustomerModelAddedFkCustomerToPickUpModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace TrashCollectorApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "71de59b7-cc30-4351-b596-f10baf8174df",
-                            ConcurrencyStamp = "13baf23c-bb05-482e-94e5-1985b6a93c87",
+                            Id = "3429e07f-da76-4f0b-897d-98a4e7437209",
+                            ConcurrencyStamp = "ff67848c-d370-403a-a3e2-30edc4f84f25",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
-                            Id = "ac4a042b-d82e-487c-bc3b-d1ce63d73255",
-                            ConcurrencyStamp = "1f3fa635-0eb7-4bf7-bd17-d2893cd3193f",
+                            Id = "f9e6a651-7199-4900-9463-63cc35c12511",
+                            ConcurrencyStamp = "ff63beeb-709a-4a9f-956b-cb9fe37af71e",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });

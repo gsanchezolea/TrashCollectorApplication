@@ -24,21 +24,21 @@ namespace TrashCollectorApp.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly RoleManager<IdentityRole> _roleManager; //Variable within the Class (added)
+        private readonly RoleManager<IdentityRole> _roleManager; 
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager) //Passed a role manager via a parameter in the constructor
+            RoleManager<IdentityRole> roleManager)
 
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            _roleManager = roleManager; //Assigned the value of the local variable to that of the parameter via dependency injection
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -114,7 +114,7 @@ namespace TrashCollectorApp.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        returnUrl += Input.Role + "s/Create";
+                        //returnUrl += Input.Role + "s/Create"; **If global routing does not work we we will go back to using this line of code to route people to their appropriate /Controller/Create
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }

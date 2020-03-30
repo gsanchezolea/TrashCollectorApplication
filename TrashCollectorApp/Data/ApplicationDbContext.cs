@@ -32,10 +32,25 @@ namespace TrashCollectorApp.Data
                         NormalizedName = "EMPLOYEE"
                     }
                     );
+            builder.Entity<Choice>()
+                .HasData(
+                new Choice
+                {
+                    Id = 1,
+                    Type = "Scheduled"
+                },
+                new Choice
+                {
+                    Id = 2,
+                    Type = "One-Time"
+                }                
+                );
         }
 
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Choice> Choices { get; set; }
+        public DbSet<PickUp> PickUps { get; set; }
     }
 }
