@@ -50,12 +50,7 @@ namespace TrashCollectorApp.Controllers
         // GET: PickUps/Create
         public IActionResult Create()
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customerId = _context.Customers.Where(c => c.IdentityUserId == userId).FirstOrDefault().Id;
-            var pickUp = new PickUp()
-            {
-                CustomerId = customerId
-            };
+            var pickUp = new PickUp();
             var choices = _context.Choices.ToList();
             ViewBag.Choices = new SelectList(choices, "Id", "Type");
             return View(pickUp);
@@ -68,34 +63,42 @@ namespace TrashCollectorApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PickUp pickUp)
         {
-
             if (ModelState.IsValid)
             {
-                if(pickUp.ChoiceId == 1)
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+                pickUp.CustomerId = customer.Id;
+
+                if (pickUp.ChoiceId == 1)
                 {
-                    var customer = _context.Customers.Where(c => c.Id == pickUp.CustomerId).SingleOrDefault();                    
+
                     var endDate = customer.EndDate; //Last pickup day
                     var scheduledDate = pickUp.Date;
 
                     //Temporary List to keep track of dates locally
                     List<PickUp> pickUps = new List<PickUp>();
 
-                    for (var i = scheduledDate; i < endDate; i.AddDays(7))
+                    for (var i = scheduledDate; i < endDate; i = i.AddDays(7))
                     {
-                        pickUp.Date = i;
-                        _context.Add(pickUp);
-                        await _context.SaveChangesAsync();
+                        PickUp newPickUp = new PickUp()
+                        {
+                            CustomerId = pickUp.CustomerId,
+                            ChoiceId = pickUp.ChoiceId,
+                            Date = i
+                        };
+                        await _context.AddAsync(newPickUp);
                         pickUps.Add(pickUp);
                     }
+                    await _context.SaveChangesAsync();
                     return RedirectToAction("Dashboard", "Customers");
                 }
-                else if(pickUp.ChoiceId == 2)
+                else if (pickUp.ChoiceId == 2)
                 {
                     _context.Add(pickUp);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Dashboard", "Customers");
                 }
-               
+
             }
             ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
