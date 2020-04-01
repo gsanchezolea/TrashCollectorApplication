@@ -5,11 +5,6 @@
     <UserSecretsId>aspnet-TrashCollectorApp-D7ADD85F-D7E0-499C-BD40-5EF59E637180</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\Migrations\20200330145759_CreatedAGlobalRoutingClassToRouteAccordingToRole.cs" />
-    <Compile Remove="Data\Migrations\20200330145759_CreatedAGlobalRoutingClassToRouteAccordingToRole.Designer.cs" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.2" />
@@ -19,11 +14,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>

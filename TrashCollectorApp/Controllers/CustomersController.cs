@@ -187,8 +187,18 @@ namespace TrashCollectorApp.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
-            var listOfPickUps = _context.PickUps.Include(c => c.Customer).Include(c => c.Choice).Where(c => c.CustomerId == customer.Id);
-            var listOfCustomers = await _context.Customers.Include(c => c.IdentityUser).Include(c => c.Address).Where(c => c.IdentityUserId == userId).ToListAsync();
+
+            var listOfPickUps = _context.PickUps
+                .Include(c => c.Customer)
+                .Include(c => c.Choice)
+                .Where(c => c.CustomerId == customer.Id);
+
+            var listOfCustomers = await _context.Customers
+                .Include(c => c.IdentityUser)
+                .Include(c => c.Address)
+                .Where(c => c.IdentityUserId == userId)
+                .ToListAsync();
+
             ViewBag.Customers = listOfCustomers; 
             return View(await listOfPickUps.ToListAsync());
         }

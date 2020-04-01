@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -48,8 +49,9 @@ namespace TrashCollectorApp.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
+            Employee employee = new Employee();
+
+            return View(employee);
         }
 
         // POST: Employees/Create
@@ -57,13 +59,15 @@ namespace TrashCollectorApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,IdentityUserId,FullName,ZipCode")] Employee employee)
+        public async Task<IActionResult> Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                employee.IdentityUserId = userId;
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Dashboard));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", employee.IdentityUserId);
             return View(employee);
@@ -155,6 +159,27 @@ namespace TrashCollectorApp.Controllers
         private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> Dashboard()
+        {
+            var dateToday = DateTime.Today;
+
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var employee = _context.Employees.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+
+            var listOfPickUps = _context.PickUps
+                .Include(p => p.Choice)
+                .Include(p => p.Customer)
+                .Where(p => (p.Date == dateToday) &&  (p.Customer.Address.ZipCode == employee.ZipCode));
+
+            var listOfEmployees = await _context.Employees
+                .Include(e => e.IdentityUser)
+                .Where(e => e.IdentityUserId == userId)
+                .ToListAsync();
+
+            ViewBag.Employees = listOfEmployees;
+            return View(await listOfPickUps.ToListAsync());
         }
     }
 }
