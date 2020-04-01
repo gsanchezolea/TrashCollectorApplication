@@ -10,18 +10,18 @@
 <div>
     <h4>Customer</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdentityUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdentityUser.Id)
-        </dd>
+    <dl class="row">       
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Address)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address.StreetAddress)
+            <br />
             @Html.DisplayFor(model => model.Address.City)
+            <br />
+            @Html.DisplayFor(model => model.Address.State)
+            <br />
+            @Html.DisplayFor(model => model.Address.ZipCode)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.FirstName)
@@ -62,6 +62,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-controller="Customers" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Dashboard" asp-controller="Customers">Back to List</a>
 </div>

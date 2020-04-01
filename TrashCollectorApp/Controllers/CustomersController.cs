@@ -45,7 +45,11 @@ namespace TrashCollectorApp.Controllers
             {
                 return NotFound();
             }
-
+            
+            if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
             return View(customer);
         }
 
@@ -88,13 +92,20 @@ namespace TrashCollectorApp.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _context.Customers
+                .Include(c => c.IdentityUser)
+                .Include(c => c.Address)
+                .Where(c => c.Id == id)
+                .SingleOrDefaultAsync();
             if (customer == null)
             {
                 return NotFound();
             }
-            ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "City", customer.AddressId);
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
+            
             return View(customer);
         }
 
@@ -103,12 +114,12 @@ namespace TrashCollectorApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,IdentityUserId,AddressId,FirstName,LastName,AccountIsActive,StartDate,EndDate,PickUpDay,Balance")] Customer customer)
+        public async Task<IActionResult> Edit(int id,Customer customer)
         {
             if (id != customer.Id)
             {
                 return NotFound();
-            }
+            }            
 
             if (ModelState.IsValid)
             {
@@ -143,6 +154,7 @@ namespace TrashCollectorApp.Controllers
                 return NotFound();
             }
 
+
             var customer = await _context.Customers
                 .Include(c => c.Address)
                 .Include(c => c.IdentityUser)
@@ -175,8 +187,65 @@ namespace TrashCollectorApp.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
-            var listOfPickUps = _context.PickUps.Include(c => c.Customer).Include(c => c.Choice);
+            var listOfPickUps = _context.PickUps.Include(c => c.Customer).Include(c => c.Choice).Where(c => c.CustomerId == customer.Id);
+            var listOfCustomers = await _context.Customers.Include(c => c.IdentityUser).Include(c => c.Address).Where(c => c.IdentityUserId == userId).ToListAsync();
+            ViewBag.Customers = listOfCustomers; 
             return View(await listOfPickUps.ToListAsync());
         }
+
+        public async Task<IActionResult> Suspend(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var customer = _context.Customers.Where(c => c.Id == id).SingleOrDefault();
+            if(customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
+            else
+            {
+                if(customer.Balance != 0)
+                {
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+                else
+                {
+                    customer.AccountIsActive = false;                
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+            }
+        }
+
+        public async Task<IActionResult> Resume(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var customer = _context.Customers.Where(c => c.Id == id).SingleOrDefault();
+            if (customer.AccountIsActive == true)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
+            else
+            {
+                if (customer.Balance != 0)
+                {
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+                else
+                {
+                    customer.AccountIsActive = true;
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Dashboard", "Customers");
+                }
+            }
+        }
+
+
+
     }
 }

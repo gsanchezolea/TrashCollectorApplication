@@ -43,13 +43,23 @@ namespace TrashCollectorApp.Controllers
             {
                 return NotFound();
             }
-
+            var customer = _context.Customers.Where(c => c.Id == pickUp.CustomerId).SingleOrDefault();
+            if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
             return View(pickUp);
         }
 
         // GET: PickUps/Create
         public IActionResult Create()
         {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(c => c.IdentityUserId == userId).SingleOrDefault();
+             if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
             var pickUp = new PickUp();
             var choices = _context.Choices.ToList();
             ViewBag.Choices = new SelectList(choices, "Id", "Type");
@@ -118,6 +128,11 @@ namespace TrashCollectorApp.Controllers
             {
                 return NotFound();
             }
+            var customer = _context.Customers.Where(c => c.Id == pickUp.CustomerId).SingleOrDefault();
+            if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
             ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
             return View(pickUp);
@@ -153,7 +168,7 @@ namespace TrashCollectorApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Dashboard", "Customers");
             }
             ViewData["ChoiceId"] = new SelectList(_context.Choices, "Id", "Type", pickUp.ChoiceId);
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "FirstName", pickUp.CustomerId);
@@ -176,6 +191,11 @@ namespace TrashCollectorApp.Controllers
             {
                 return NotFound();
             }
+            var customer = _context.Customers.Where(c => c.Id == pickUp.CustomerId).SingleOrDefault();
+            if (customer.AccountIsActive == false)
+            {
+                return RedirectToAction("Dashboard", "Customers");
+            }
 
             return View(pickUp);
         }
@@ -188,7 +208,7 @@ namespace TrashCollectorApp.Controllers
             var pickUp = await _context.PickUps.FindAsync(id);
             _context.PickUps.Remove(pickUp);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Dashboard", "Customers");
         }
 
         private bool PickUpExists(int id)
