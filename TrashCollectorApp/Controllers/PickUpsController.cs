@@ -23,6 +23,7 @@ namespace TrashCollectorApp.Controllers
         // GET: PickUps
         public async Task<IActionResult> Index()
         {
+        
             var applicationDbContext = _context.PickUps.Include(p => p.Choice).Include(p => p.Customer);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -214,6 +215,35 @@ namespace TrashCollectorApp.Controllers
         private bool PickUpExists(int id)
         {
             return _context.PickUps.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> Confirm(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            var pickUp = _context.PickUps
+                .Include(p => p.Choice)
+                .Include(p => p.Customer)
+                .ThenInclude(p => p.Address)
+                .Where(p => p.Id == id)
+                .FirstOrDefault();
+
+            if(pickUp.Confirmed == true)
+            {
+                return RedirectToAction("Dashboard", "Employees");
+            }
+
+            var customer = _context.Customers
+                .Where(c => c.Id == pickUp.CustomerId)
+                .SingleOrDefault();
+
+            pickUp.Confirmed = true;
+            customer.Balance += 29.99;
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Dashboard", "Employees");
         }
     }
 }

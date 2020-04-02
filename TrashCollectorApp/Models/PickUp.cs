@@ -20,8 +20,10 @@ namespace TrashCollectorApp.Models
         public int ChoiceId { get; set; }
         public Choice Choice { get; set; }
 
-        [Required]
         [Display(Name = "Pick-Up Day")]
+        [Required]        
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime Date { get; set; }
 
         public bool Confirmed { get; set; }

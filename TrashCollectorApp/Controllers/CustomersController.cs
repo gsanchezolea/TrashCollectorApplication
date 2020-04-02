@@ -23,10 +23,22 @@ namespace TrashCollectorApp.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            var applicationDbContext = _context.Customers.Include(c => c.Address).Include(c => c.IdentityUser);
-            return View(await applicationDbContext.ToListAsync());
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var pickUp = await _context.PickUps
+                .Where(p => p.Id == id)
+                .SingleOrDefaultAsync();
+
+            var customer = await _context.Customers
+                .Include(c => c.Address)
+                .Where(c => c.Id == pickUp.CustomerId)
+                .SingleOrDefaultAsync();
+            
+            return View(customer);
         }
 
         // GET: Customers/Details/5

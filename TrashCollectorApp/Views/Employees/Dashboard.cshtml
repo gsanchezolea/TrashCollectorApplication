@@ -6,10 +6,34 @@
 }
 
 <h1>Dashboard</h1>
+<div class="col-lg-12">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Employee Name
+                </th>               
+                <th>
+                    Work Area 
+                </th>  
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Employees)
+            {
+                <tr>
+                    <td>
+                        @item.FullName
+                    </td>                    
+                    <td>
+                        @item.ZipCode
+                    </td>                   
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -32,7 +56,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Customer.FirstName)
+                @Html.ActionLink(item.Customer.FirstName, "Index", "Customers", new { id = item.Id }, null)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Choice.Type)
@@ -44,9 +68,8 @@
                 @Html.DisplayFor(modelItem => item.Confirmed)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Confirm" asp-controller="PickUps" asp-route-id="@item.Id">Confirm</a> 
+              
             </td>
         </tr>
 }

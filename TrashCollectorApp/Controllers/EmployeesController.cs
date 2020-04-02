@@ -163,7 +163,8 @@ namespace TrashCollectorApp.Controllers
 
         public async Task<IActionResult> Dashboard()
         {
-            var dateToday = DateTime.Today;
+            var currentDay = DateTime.Today;
+            
 
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var employee = _context.Employees.Where(c => c.IdentityUserId == userId).SingleOrDefault();
@@ -171,15 +172,33 @@ namespace TrashCollectorApp.Controllers
             var listOfPickUps = _context.PickUps
                 .Include(p => p.Choice)
                 .Include(p => p.Customer)
-                .Where(p => (p.Date == dateToday) &&  (p.Customer.Address.ZipCode == employee.ZipCode));
+                .ThenInclude(p => p.Address)
+                .Where(p => p.Customer.Address.ZipCode == employee.ZipCode && p.Date == currentDay);
+                
 
             var listOfEmployees = await _context.Employees
                 .Include(e => e.IdentityUser)
                 .Where(e => e.IdentityUserId == userId)
                 .ToListAsync();
-
+            
             ViewBag.Employees = listOfEmployees;
             return View(await listOfPickUps.ToListAsync());
         }
+
+        /*public async Task<IActionResult> FilterDay(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var employee = _context.Employees.Where(c => c.IdentityUserId == userId).SingleOrDefault(); 
+
+            var listOfPickUps = _context.PickUps
+                .Include(p => p.Choice)
+                .Include(p => p.Customer)
+                .ThenInclude(p => p.Address)
+                .Where(p => p.Customer.Address.ZipCode == employee.ZipCode && p.Date.DayOfWeek == );
+        }*/
     }
 }

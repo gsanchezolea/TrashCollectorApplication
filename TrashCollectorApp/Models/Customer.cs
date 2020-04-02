@@ -33,9 +33,15 @@ namespace TrashCollectorApp.Models
         public bool AccountIsActive { get; set; }
 
         [Display(Name = "Start Date")]
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime StartDate { get; set; }
 
         [Display(Name = "End Date")]
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime EndDate { get; set; }
               
         public double Balance { get; set; }

@@ -1,78 +1,84 @@
-﻿@model IEnumerable<TrashCollectorApp.Models.Customer>
+﻿@model TrashCollectorApp.Models.Customer
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Set the size of the div element that contains the map */
+        #map {
+            height: 400px; /* The height is 400 pixels */
+            width: 100%; /* The width is the width of the web page */
+        }
+    </style>
+</head>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IdentityUser)
-            </th>
-            <th>
+<body>
+
+    <div>
+        <h4>Customer</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Address.StreetAddress)
+                <br />
+                @Html.DisplayFor(model => model.Address.City)
+                <br />
+                @Html.DisplayFor(model => model.Address.State)
+                <br />
+                @Html.DisplayFor(model => model.Address.ZipCode)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.AccountIsActive)
-            </th>
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.AccountIsActive)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.StartDate)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.EndDate)
-            </th>        
-            <th>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.EndDate)
+            </dd>
+            <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Balance)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdentityUser.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address.City)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountIsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Balance)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Balance)
+            </dd>
+        </dl>
+    </div>
+    <div id="map"></div>
+    <div>
+        <a asp-action="Edit" asp-controller="Customers" asp-route-id="@Model.Id">Edit</a> |
+        <a asp-action="Dashboard" asp-controller="Customers">Back to List</a>
+    </div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJLjyFDMlKuRh-0eLmQnB3PoivI8Ku0_o&callback=initMap"
+            type="text/javascript"></script>
+</body>
+</html>
